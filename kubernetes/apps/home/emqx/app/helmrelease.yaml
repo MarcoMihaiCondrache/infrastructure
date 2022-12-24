@@ -23,8 +23,8 @@ spec:
     remediation:
       retries: 3
   dependsOn:
-    - name: rook-ceph-cluster
-      namespace: rook-ceph
+    - name: longhorn
+      namespace: longhorn-system
   values:
     image:
       repository: public.ecr.aws/emqx/emqx
