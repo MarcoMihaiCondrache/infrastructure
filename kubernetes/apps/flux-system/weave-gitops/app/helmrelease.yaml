@@ -25,9 +25,6 @@ spec:
     adminUser:
       create: true
       username: admin
-    service:
-      type: LoadBalancerIP
-      loadBalancerIP: ${SVC_WEAVE_GITOPS_LB_IP}
     networkPolicy:
       create: false
     metrics:

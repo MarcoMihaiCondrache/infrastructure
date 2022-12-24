@@ -9,6 +9,10 @@ metadata:
 spec:
   path: ./kubernetes/apps/flux-system/weave-gitops/app
   prune: true
+  dependsOn:
+    - name: cluster-apps-metallb
+    - name: cluster-apps-traefik
+    - name: cluster-apps-cloudflared
   sourceRef:
     kind: GitRepository
     name: home-kubernetes
