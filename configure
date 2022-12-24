@@ -85,7 +85,6 @@ main() {
         # generate ansible hosts file and secrets
         generate_ansible_hosts
         generate_ansible_host_secrets
-        setup_github_webhook
         setup_weave_gitops
         success
     fi
@@ -151,6 +150,19 @@ _has_valid_ip() {
         exit 1
     else
         _log "INFO" "Variable '${variable_name}' has a valid IP address '${ip}'"
+    fi
+}
+
+verify_svc_settings(){
+    _has_envar "BOOTSTRAP_SVC_EMQX_DASHBOARD_USER"
+    _has_envar "BOOTSTRAP_SVC_EMQX_DASHBOARD_PASSWORD"
+    _has_envar "BOOTSTRAP_SVC_ZIGBEE2MQTT_USER"
+    _has_envar "BOOTSTRAP_SVC_ZIGBEE2MQTT_PASSWORD"
+    _has_envar "BOOTSTRAP_SVC_ZIGBEE2MQTT_DEVICE"
+
+    if [[ "$BOOTSTRAP_SVC_ZIGBEE2MQTT_DEVICE" != "/dev/serial/by-id/"* ]]; then
+        _log "ERROR" "The variable SVC_ZIGBEE2MQTT_DEVICE must be a valid serial path like /dev/serial/by-id/..."
+        exit 1
     fi
 }
 
@@ -308,16 +320,12 @@ verify_metallb() {
     local ip_floor=
     local ip_ceil=
     _has_envar "BOOTSTRAP_METALLB_LB_RANGE"
-    _has_envar "BOOTSTRAP_METALLB_K8S_GATEWAY_ADDR"
-    _has_envar "BOOTSTRAP_METALLB_INGRESS_ADDR"
 
     ip_floor=$(echo "${BOOTSTRAP_METALLB_LB_RANGE}" | cut -d- -f1)
     ip_ceil=$(echo "${BOOTSTRAP_METALLB_LB_RANGE}" | cut -d- -f2)
 
     _has_valid_ip "${ip_floor}" "BOOTSTRAP_METALLB_LB_RANGE"
     _has_valid_ip "${ip_ceil}" "BOOTSTRAP_METALLB_LB_RANGE"
-    _has_valid_ip "${BOOTSTRAP_METALLB_K8S_GATEWAY_ADDR}" "BOOTSTRAP_METALLB_K8S_GATEWAY_ADDR"
-    _has_valid_ip "${BOOTSTRAP_METALLB_INGRESS_ADDR}" "BOOTSTRAP_METALLB_INGRESS_ADDR"
 }
 
 verify_git_repository() {
