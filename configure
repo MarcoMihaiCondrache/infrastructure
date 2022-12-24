@@ -62,6 +62,10 @@ main() {
             > "${PROJECT_DIR}/kubernetes/apps/networking/cloudflared/app/secret.sops.yaml"
         sops --encrypt --in-place "${PROJECT_DIR}/kubernetes/apps/networking/cloudflared/app/secret.sops.yaml"
 
+        envsubst < "${PROJECT_DIR}/tmpl/kubernetes/emqx-secret.sops.yaml" \
+            > "${PROJECT_DIR}/kubernetes/apps/home/emqx/app/secret.sops.yaml"
+        sops --encrypt --in-place "${PROJECT_DIR}/kubernetes/apps/home/emqx/app/secret.sops.yaml"
+
         envsubst < "${PROJECT_DIR}/tmpl/kubernetes/zigbee2mqtt-secret.sops.yaml" \
             > "${PROJECT_DIR}/kubernetes/apps/home/zigbee2mqtt/app/secret.sops.yaml"
         sops --encrypt --in-place "${PROJECT_DIR}/kubernetes/apps/home/zigbee2mqtt/app/secret.sops.yaml"

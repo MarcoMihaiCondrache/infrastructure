@@ -1,14 +1,16 @@
 ---
+# yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/helmrelease_v2beta1.json
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: emqx
+  namespace: default
 spec:
-  interval: 5m
+  interval: 15m
   chart:
     spec:
-      chart: emqx-operator
-      version: 2.0.3
+      chart: emqx
+      version: 5.0.12
       sourceRef:
         kind: HelmRepository
         name: emqx
@@ -16,21 +18,33 @@ spec:
   install:
     createNamespace: true
     remediation:
-      retries: 5
+      retries: 3
   upgrade:
     remediation:
       retries: 3
   dependsOn:
-    - name: metallb
-      namespace: networking
-    - name: longhorn
-      namespace: longhorn-system
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
   values:
-    skipCRDs: false
-    replicaCount: 1
-    resources:
-      limits:
-        memory: 256Mi
-      requests:
-        cpu: 100m
-        memory: 30Mi
+    image:
+      repository: public.ecr.aws/emqx/emqx
+    replicaCount: 3
+    recreatePods: true
+    emqxConfig:
+      EMQX_ALLOW_ANONYMOUS: "false"
+      EMQX_AUTH__MNESIA__PASSWORD_HASH: plain
+    service:
+      type: LoadBalancer
+      externalIPs: ["${SVC_EMQX_LB_IP}"]
+      externalTrafficPolicy: Local
+    metrics:
+      enabled: false
+    persistence:
+      enabled: true
+      storageClass: longhorn
+      size: 100Mi
+  valuesFrom:
+    - targetPath: emqxConfig.EMQX_DASHBOARD__DEFAULT_PASSWORD
+      kind: Secret
+      name: emqx-secret
+      valuesKey: admin_password
