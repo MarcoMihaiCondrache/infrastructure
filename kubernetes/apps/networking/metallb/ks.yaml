@@ -9,7 +9,6 @@ metadata:
 spec:
   dependsOn:
     - name: cluster-apps-node-feature-discovery
-      namespace: node-feature-discovery
   path: ./kubernetes/apps/networking/metallb/app
   prune: true
   sourceRef:
