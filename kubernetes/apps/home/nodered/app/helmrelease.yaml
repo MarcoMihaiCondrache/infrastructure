@@ -24,7 +24,7 @@ spec:
   dependsOn:
     - name: emqx
       namespace: home
-    - name: home-assistant
+    - name: homeassistant
       namespace: home
   values:
     podAnnotations:
