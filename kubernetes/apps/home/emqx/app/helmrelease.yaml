@@ -7,8 +7,8 @@ spec:
   interval: 5m
   chart:
     spec:
-      chart: emqx
-      version: 5.0.11
+      chart: emqx-operator
+      version: 2.0.3
       sourceRef:
         kind: HelmRepository
         name: emqx
@@ -26,22 +26,11 @@ spec:
     - name: longhorn
       namespace: longhorn-system
   values:
-    replicaCount: 3
-    recreatePods: true
-    emqxConfig:
-      EMQX_ALLOW_ANONYMOUS: "false"
-    service:
-      type: LoadBalancer
-      loadBalancerIP: ${SVC_EMQX_LB_IP}
-    persistence:
-      enabled: true
-      size: 100Mi
-  valuesFrom:
-    - targetPath: emqxConfig.EMQX_DASHBOARD__DEFAULT_USERNAME
-      kind: Secret
-      name: emqx-config
-      valuesKey: dashboard_user
-    - targetPath: emqxConfig.EMQX_DASHBOARD__DEFAULT_PASSWORD
-      kind: Secret
-      name: emqx-config
-      valuesKey: dashboard_password
+    skipCRDs: false
+    replicaCount: 1
+    resources:
+      limits:
+        memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 30Mi

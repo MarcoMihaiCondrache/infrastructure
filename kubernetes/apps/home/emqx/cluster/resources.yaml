@@ -1,0 +1,73 @@
+---
+apiVersion: apps.emqx.io/v2alpha1
+kind: EMQX
+metadata:
+  name: emqx
+  namespace: home
+spec:
+  image: emqx/emqx:5.0.12
+  bootstrapConfig: |
+    authorization {
+      sources = [
+        {
+          type = built_in_database
+          enable = true
+        }
+      ]
+      no_match: "deny"
+    }
+    dashboard {
+      listeners.http {
+          bind: 18083
+      }
+      default_username: "admin"
+      default_password: "${SECRET_EMQX_ADMIN_PASSWORD}"
+    }
+  coreTemplate:
+    metadata:
+      name: emqx-core
+      labels:
+        apps.emqx.io/instance: emqx
+        apps.emqx.io/db-role: core
+    spec:
+      replicas: 3
+      volumeClaimTemplates:
+        storageClassName: longhorn
+        resources:
+          requests:
+            storage: 1Gi
+        accessModes:
+          - ReadWriteMany
+
+      podSecurityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: Always
+        supplementalGroups:
+          - 100
+
+  replicantTemplate:
+    spec:
+      replicas: 0
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: emqx
+  namespace: home
+  labels:
+    apps.emqx.io/db-role: core
+    apps.emqx.io/instance: emqx
+  annotations:
+    metallb.universe.tf/loadBalancerIPs: "${SVC_EMQX_LB_IP}"
+spec:
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 1883
+    - protocol: TCP
+      port: 18083
+  selector:
+    apps.emqx.io/db-role: core
+    apps.emqx.io/instance: emqx
