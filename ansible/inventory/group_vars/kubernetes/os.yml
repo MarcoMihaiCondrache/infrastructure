@@ -1,0 +1,21 @@
+---
+# (string) Timezone for the servers
+# timezone: "America/New_York"
+
+# (list) Additional ssh public keys to add to the nodes
+# ssh_authorized_keys:
+
+packages:
+  - jq
+  - iptables
+  - lm-sensors
+  - nfs-common
+  - ipvsadm
+  - open-iscsi
+  - util-linux
+  - dbus
+  - python3-pip
+  - python3-setuptools
+  - python3-kubernetes
+  - python3-yaml
+  - python3-netaddr
